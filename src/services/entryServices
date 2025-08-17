@@ -1,0 +1,79 @@
+async function getEntries(username) {
+  return fetch(`http://localhost:8080/api/entries/${username}`)
+    .then((response) => {
+      console.log("Response from getEntries:", response);
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      response
+        .clone()
+        .json()
+        .then((data) => {
+          console.log("Fetched entries:", data);
+        });
+      return response.json();
+    })
+    .catch((error) => {
+      console.error(
+        "There has been a problem with your fetch operation:",
+        error
+      );
+    });
+}
+
+async function updateEntry(username, entry) {
+  return fetch(`http://localhost:8080/api/entries/${username}/${entry.body}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(entry),
+  })
+    .then((response) => {
+      console.log("Response from updateEntry:", response);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
+
+async function postEntry(entry) {
+  return fetch("http://localhost:8080/api/entries", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(entry),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
+
+async function removeEntry(id) {
+  return fetch(`http://localhost:8080/api/entries/${id}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+}
+
+export { getEntries, postEntry, updateEntry, removeEntry };
