@@ -5,6 +5,7 @@ import {
   verifyRefreshToken,
 } from "../services/authServices.js";
 import { refreshTokenIfNeeded } from "../utitlities/tokenUtils.js";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -61,7 +62,6 @@ function AuthProvider({ children }) {
 
     initializeTokens();
   }, []);
-
   async function login(username, password) {
     try {
       const response = await fetch("http://localhost:8080/api/v1/auth/login", {
@@ -85,6 +85,7 @@ function AuthProvider({ children }) {
 
         setUser(userData);
         setLoggedIn(true);
+
         return { success: true };
       } else {
         const errorData = await response.json();
