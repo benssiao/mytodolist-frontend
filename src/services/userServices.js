@@ -1,5 +1,5 @@
 async function createUser(userData) {
-  return fetch("http://localhost:8080/api/users", {
+  return fetch("http://localhost:8080/api/v1/users", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -17,11 +17,12 @@ async function createUser(userData) {
     });
 }
 
-async function getUser(username) {
-  return fetch(`http://localhost:8080/api/users/${username}`, {
+async function getUser(accessToken) {
+  return fetch(`http://localhost:8080/api/v1/users/me`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
   })
     .then((response) => {

@@ -3,52 +3,29 @@ import "./App.css";
 import TopHeader from "./components/TopHeader";
 import Footer from "./components/Footer";
 import TodoList from "./components/TodoList";
+
+import { useAuth } from "./hooks/useAuth.js";
+import LoginCard from "./components/auth/LoginCard.jsx";
+import RegisterCard from "./components/auth/RegisterCard.jsx";
 import {
   getEntries,
   postEntry,
   updateEntry,
   removeEntry,
 } from "./services/entryServices";
-import { createUser, getUser } from "./services/userServices";
+import { createUser, getUser } from "./services/userServices.js";
 
 function App() {
-  const [testText, setTestText] = useState("");
-  const [username, setUsername] = useState("");
-  const [entries, setEntries] = useState([
-    { id: crypto.randomUUID(), text: "hello" },
-    { id: crypto.randomUUID(), text: "goodbye" },
-  ]);
+  const { user, loggedIn, loading } = useAuth();
 
-  useEffect(() => {
-    localStorage.clear();
-    async function initializeUser() {
-      let username = localStorage.getItem("username");
-      console.log("Retrieved username from localStorage:", username);
-      if (!username) {
-        username = "anon_" + crypto.randomUUID();
-        setUsername(username);
-        localStorage.setItem("username", username);
-        try {
-          console.log("Creating new user with username:", username);
-          await createUser({ username: username });
-          setEntries([]);
-        } catch (error) {
-          console.error("Error creating user:", error);
-        }
-      } else {
-        try {
-          const userEntries = await getEntries(username);
-          setUsername(username);
-          console.log("Fetched entries:", userEntries);
-          setEntries(userEntries);
-        } catch (error) {
-          console.error("Error fetching entries:", error);
-        }
-      }
-    }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    initializeUser();
-  }, []);
+  if (!loggedIn) {
+    
+
+  
 
   const [loggedIn, setLoggedIn] = useState(false);
 
