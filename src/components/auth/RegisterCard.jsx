@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth.js";
+import { useNavigate } from "react-router-dom";
+import { ErrorContext } from "../../contexts/ErrorContext.jsx";
+import { useContext } from "react";
 
 function RegisterCard({ onSwitchToLogin, onClose }) {
   const { register } = useAuth();
@@ -8,6 +11,7 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { showError } = useContext(ErrorContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +30,7 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
         onSwitchToLogin();
       }, 1500);
     } catch (err) {
-      setError(err.message);
+      showError(err.message || "Failed to register.");
     }
   };
 
@@ -51,7 +55,7 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
           minLength="3"
         />
@@ -60,7 +64,7 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
           minLength="6"
         />
@@ -69,12 +73,12 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         />
         <button
           type="submit"
-          className="w-full p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200"
+          className="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-blue-500 transition-colors duration-200"
         >
           Register
         </button>

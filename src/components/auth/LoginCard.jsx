@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
+import { ErrorContext } from "../../contexts/ErrorContext.jsx";
+import { useContext } from "react";
 
 function LoginCard({ onSwitchToRegister, onClose }) {
   const { login } = useAuth();
@@ -8,6 +10,7 @@ function LoginCard({ onSwitchToRegister, onClose }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { showError } = useContext(ErrorContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +20,7 @@ function LoginCard({ onSwitchToRegister, onClose }) {
       await login(username, password);
       navigate("/"); // Redirect to home on successful login
     } catch (err) {
-      setError(err.message);
+      showError(err.message || "Failed to login.");
     }
   };
 

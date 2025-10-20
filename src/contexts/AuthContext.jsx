@@ -6,13 +6,14 @@ import {
 } from "../services/authServices.js";
 import { refreshTokenIfNeeded } from "../utitlities/tokenUtils.js";
 import { useNavigate } from "react-router-dom";
-
+import { getUser } from "../services/userServices.js";
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function initializeTokens() {
@@ -48,6 +49,8 @@ function AuthProvider({ children }) {
           localStorage.setItem("refreshToken", refreshToken);
           accessToken = localStorage.getItem("accessToken");
         }
+        const userData = await getUser(accessToken);
+        setUser(userData);
         setLoggedIn(true);
       } catch (error) {
         console.error("Error during token verification:", error);
@@ -98,6 +101,10 @@ function AuthProvider({ children }) {
   }
 
   async function logout() {
+    if (!user) {
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:8080/api/v1/auth/logout", {
         method: "POST",

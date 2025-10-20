@@ -1,13 +1,13 @@
 async function verifyAccessToken(accessToken) {
   try {
     const verification = await fetch(
-      "http://localhost:8080/api/v1/auth/verify",
+      "http://localhost:8080/api/v1/auth/verifyaccess",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ accessToken }),
+        body: JSON.stringify({ accessToken: accessToken }),
       }
     );
     return verification.ok;
@@ -20,13 +20,13 @@ async function verifyAccessToken(accessToken) {
 async function verifyRefreshToken(refreshToken) {
   try {
     const verification = await fetch(
-      "http://localhost:8080/api/v1/auth/verifyRefresh",
+      "http://localhost:8080/api/v1/auth/verifyrefresh",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify({ refreshToken: refreshToken }),
       }
     );
     return verification.ok;

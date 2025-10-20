@@ -1,5 +1,5 @@
 async function createUser(userData) {
-  return fetch("http://localhost:8080/api/v1/users", {
+  return fetch("http://localhost:8080/api/v1/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,6 +18,7 @@ async function createUser(userData) {
 }
 
 async function getUser(accessToken) {
+  console.log("Fetching user with access token:", accessToken);
   return fetch(`http://localhost:8080/api/v1/users/me`, {
     method: "GET",
     headers: {
@@ -36,6 +37,7 @@ async function getUser(accessToken) {
         "There has been a problem with your fetch operation:",
         error
       );
+      throw error;
     });
 }
 

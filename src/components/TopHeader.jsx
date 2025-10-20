@@ -1,16 +1,19 @@
 import NavBar from "./NavBar";
 import TodoLogo from "./TodoLogo";
+import { useAuth } from "../hooks/useAuth";
 
 function TopHeader() {
+  const { loggedIn, user } = useAuth();
   return (
     <nav className="flex items-center justify-between bg-[#119DA4] dark:bg-gray-800 p-4">
       <div className="flex">
         <TodoLogo />
         <div className="flex flex-col">
-          <p>Woohoo</p> 
+          <p>Woohoo</p>
           <p>Todo</p>
         </div>
       </div>
+      {loggedIn && <div>Welcome {user?.username}</div>}
       <NavBar />
     </nav>
   );

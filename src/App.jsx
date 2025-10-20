@@ -3,9 +3,11 @@ import { useAuth } from "./hooks/useAuth.js";
 import TopHeader from "./components/TopHeader";
 import Footer from "./components/Footer";
 import TodoList from "./components/TodoList";
-import Modal from "./modals/DimmedModal.jsx";
+import DimmedModal from "./modals/DimmedModal.jsx";
 import LoginCard from "./components/auth/LoginCard";
 import RegisterCard from "./components/auth/RegisterCard";
+import HomePage from "./pages/HomePage.jsx";
+import { NotFoundPage } from "./pages/NotFoundPage.jsx";
 
 function App() {
   const { loggedIn, loading } = useAuth();
@@ -31,68 +33,36 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen w-screen bg-[#FFC857]">
       <TopHeader />
-
-      <div className="flex-1 py-20 grid grid-cols-[1fr_3fr_1fr] border-t-1 border-[#DFA837] border-b-1">
-        <div></div>
-        <div>
-          {loggedIn ? (
-            <TodoList />
-          ) : (
-            <div className="bg-gray-100 dark:bg-gray-700 p-8 rounded-lg shadow-md w-full h-full flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold mb-4 text-gray-800">
-                Welcome to Woohoo Todo!
-              </h1>
-              <p className="text-gray-600 mb-8 text-center">
-                Please login or register to start managing your tasks.
-              </p>
-              <div className="space-x-4">
-                <button
-                  onClick={() => navigate("/login")}
-                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => navigate("/register")}
-                  className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  Register
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div></div>
-      </div>
-
-      <Footer />
-
+      <HomePage />
       {/* Route-based Modals */}
       <Routes>
         <Route
           path="/login"
           element={
-            <Modal isOpen={true} onClose={handleCloseModal}>
+            <DimmedModal isOpen={true} onClose={handleCloseModal}>
               <LoginCard
                 onSwitchToRegister={() => navigate("/register")}
                 onClose={handleCloseModal}
               />
-            </Modal>
+            </DimmedModal>
           }
         />
 
         <Route
           path="/register"
           element={
-            <Modal isOpen={true} onClose={handleCloseModal}>
+            <DimmedModal isOpen={true} onClose={handleCloseModal}>
               <RegisterCard
                 onSwitchToLogin={() => navigate("/login")}
                 onClose={handleCloseModal}
               />
-            </Modal>
+            </DimmedModal>
           }
         />
+        <Route path="/" element={<div />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Footer />
     </div>
   );
 }
