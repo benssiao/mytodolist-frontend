@@ -3,6 +3,7 @@ import { useAuth } from "../../hooks/useAuth.js";
 import { useNavigate } from "react-router-dom";
 import { ErrorContext } from "../../contexts/ErrorContext.jsx";
 import { useContext } from "react";
+import { apiFetch } from "../../utilities/apiFetch.js";
 
 function RegisterCard({ onSwitchToLogin, onClose }) {
   const { register } = useAuth();
@@ -25,7 +26,7 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
 
     try {
       await register(username, password);
-      setSuccess("Registration successful!");
+      setSuccess("Registration successful! Redirecting to login page.");
       setTimeout(() => {
         onSwitchToLogin();
       }, 1500);
@@ -83,7 +84,6 @@ function RegisterCard({ onSwitchToLogin, onClose }) {
           Register
         </button>
       </form>
-
       <div className="mt-4 text-center text-sm">
         <span className="text-gray-600">Already have an account? </span>
         <button

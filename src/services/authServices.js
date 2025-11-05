@@ -1,39 +1,36 @@
-async function verifyAccessToken(accessToken) {
+import { apiFetch } from "../utilities/apiFetch.js";
+
+async function verifyAccessToken(token) {
+  const res = await apiFetch("http://localhost:8080/api/v1/auth/verifyaccess", {
+    method: "POST",
+    body: JSON.stringify({ accessToken: token }),
+  });
+  return res === "Access token is valid" || res.valid === true;
+}
+
+async function verifyRefreshToken(token) {
+  const res = await apiFetch(
+    "http://localhost:8080/api/v1/auth/verifyrefresh",
+    {
+      method: "POST",
+      body: JSON.stringify({ refreshToken: token }),
+    }
+  );
+  return res === "Refresh token is valid" || res.valid === true;
+}
+
+async function logoutService(username) {
   try {
-    const verification = await fetch(
-      "http://localhost:8080/api/v1/auth/verifyaccess",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ accessToken: accessToken }),
-      }
-    );
-    return verification.ok;
+    await apiFetch("http://localhost:8080/api/v1/auth/logout", {
+      method: "POST",
+      body: JSON.stringify({ username: username }),
+    });
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   } catch (error) {
-    console.error("Error verifying access token:", error);
-    return false;
+    console.error("Error during logout:", error);
+    throw error;
   }
 }
 
-async function verifyRefreshToken(refreshToken) {
-  try {
-    const verification = await fetch(
-      "http://localhost:8080/api/v1/auth/verifyrefresh",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken: refreshToken }),
-      }
-    );
-    return verification.ok;
-  } catch (error) {
-    console.error("Error verifying refresh token:", error);
-    return false;
-  }
-}
-
-export { verifyAccessToken, verifyRefreshToken };
+export { verifyAccessToken, verifyRefreshToken, logoutService };

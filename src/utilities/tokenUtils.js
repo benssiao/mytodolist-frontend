@@ -9,15 +9,19 @@ function isTokenExpired(token) {
   }
 }
 
+// refreshes both refresh and access token if access token is expired
 async function refreshTokenIfNeeded() {
-  const token = localStorage.getItem("accessToken");
+  const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
 
-  if (!token || !refreshToken) {
+  if (!accessToken || !refreshToken) {
     throw new Error("No token or refresh token found");
   }
+  if (accessToken && !isTokenExpired(accessToken)) {
+    return accessToken;
+  }
 
-  if (isTokenExpired(token)) {
+  if (isTokenExpired(accessToken)) {
     try {
       const response = await fetch(
         "http://localhost:8080/api/v1/auth/refresh",
@@ -29,10 +33,6 @@ async function refreshTokenIfNeeded() {
           body: JSON.stringify({ refreshToken }),
         }
       );
-      if (response.status === 401 || response.status === 403) {
-        // Refresh token is expired so redirect to login.
-        throw new Error("Refresh token expired");
-      }
       if (!response.ok) {
         throw new Error("Failed to refresh token");
       }
@@ -48,8 +48,6 @@ async function refreshTokenIfNeeded() {
       throw error;
     }
   }
-
-  return token;
 }
 
 export { isTokenExpired, refreshTokenIfNeeded };

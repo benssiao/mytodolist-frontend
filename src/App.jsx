@@ -34,7 +34,7 @@ function App() {
     <div className="flex flex-col min-h-screen w-screen bg-[#FFC857]">
       <TopHeader />
       <HomePage />
-      {/* Route-based Modals */}
+
       <Routes>
         <Route
           path="/login"

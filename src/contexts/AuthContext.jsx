@@ -4,9 +4,12 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
 } from "../services/authServices.js";
-import { refreshTokenIfNeeded } from "../utitlities/tokenUtils.js";
+import { refreshTokenIfNeeded } from "../utilities/tokenUtils.js";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../services/userServices.js";
+import { logoutService } from "../services/authServices.js";
+
+import { apiFetch } from "../utilities/apiFetch.js";
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
@@ -17,6 +20,7 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     async function initializeTokens() {
+      setLoading(true);
       let accessToken = localStorage.getItem("accessToken");
       let refreshToken = localStorage.getItem("refreshToken");
 
@@ -31,6 +35,7 @@ function AuthProvider({ children }) {
         const isAccessTokenValid = await verifyAccessToken(accessToken);
         const isRefreshTokenValid = await verifyRefreshToken(refreshToken);
         if (!isRefreshTokenValid) {
+          // Refresh token invalid, so clear all and log out
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           setUser(null);
@@ -42,14 +47,10 @@ function AuthProvider({ children }) {
         }
 
         if (!isAccessTokenValid) {
-          refreshToken = await refreshTokenIfNeeded(refreshToken);
-          if (!refreshToken) {
-            throw new Error("Unable to refresh access token");
-          }
-          localStorage.setItem("refreshToken", refreshToken);
+          await refreshTokenIfNeeded();
           accessToken = localStorage.getItem("accessToken");
         }
-        const userData = await getUser(accessToken);
+        const userData = await getUser();
         setUser(userData);
         setLoggedIn(true);
       } catch (error) {
@@ -65,35 +66,27 @@ function AuthProvider({ children }) {
 
     initializeTokens();
   }, []);
+
   async function login(username, password) {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+      const data = await apiFetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ username, password }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
 
-        const userData = {
-          id: data.userId,
-          username: data.username,
-          roles: data.roles,
-        };
+      const userData = {
+        id: data.userId,
+        username: data.username,
+        roles: data.roles,
+      };
 
-        setUser(userData);
-        setLoggedIn(true);
+      setUser(userData);
+      setLoggedIn(true);
 
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
-      }
+      return { success: true };
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -106,25 +99,12 @@ function AuthProvider({ children }) {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: user?.username }),
-      });
-
-      if (!response.ok) {
-        console.error("Logout failed on server");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      // Always clear local state regardless of server response
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
+      await logoutService(user.username);
       setUser(null);
       setLoggedIn(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   }
 

@@ -1,115 +1,58 @@
-async function getEntries() {
-  const token = localStorage.getItem("accessToken");
+import { apiFetch } from "../utilities/apiFetch.js";
 
-  if (!token) {
-    console.log("No JWT token found in local storage");
-    return [];
-  }
-
-  return fetch(`http://localhost:8080/api/v1/entries/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      console.log("Response from getEntries:", response);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      response
-        .clone()
-        .json()
-        .then((data) => {
-          console.log("Fetched entries:", data);
-        });
-      return response.json();
-    })
-    .catch((error) => {
-      console.error(
-        "There has been a problem with your fetch operation:",
-        error
-      );
+export async function getEntries() {
+  try {
+    const data = await apiFetch("http://localhost:8080/api/v1/entries", {
+      method: "GET",
     });
+    console.log("Fetched entries:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    throw error;
+  }
 }
 
-async function updateEntry(entryId, newBody) {
-  const token = localStorage.getItem("accessToken");
-
-  if (!token) {
-    console.log("No JWT token found in local storage");
-    return null;
-  }
-
-  return fetch(`http://localhost:8080/api/v1/entries/${entryId}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newBody),
-  })
-    .then((response) => {
-      console.log("Response from updateEntry:", response);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
+export async function postEntry(entry) {
+  try {
+    const data = await apiFetch("http://localhost:8080/api/v1/entries", {
+      method: "POST",
+      body: JSON.stringify(entry),
     });
+    console.log("Created entry:", data);
+    return data;
+  } catch (error) {
+    console.error("Error posting entry:", error);
+    throw error;
+  }
 }
 
-async function postEntry(entry) {
-  const token = localStorage.getItem("accessToken");
-
-  if (!token) {
-    console.log("No JWT token found in local storage");
-    return null;
-  }
-  return fetch("http://localhost:8080/api/v1/entries", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(entry),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+export async function updateEntry(entryId, newBody) {
+  try {
+    const data = await apiFetch(
+      `http://localhost:8080/api/v1/entries/${entryId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(newBody),
       }
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
-    });
+    );
+    console.log("Updated entry:", data);
+    return data;
+  } catch (error) {
+    console.error("Error updating entry:", error);
+    throw error;
+  }
 }
 
-async function removeEntry(id) {
-  const accessToken = localStorage.getItem("accessToken");
-
-  if (!accessToken) {
-    console.log("No JWT token found in local storage");
-    return null;
-  }
-  return fetch(`http://localhost:8080/api/v1/entries/${id}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("There was a problem with the fetch operation:", error);
+export async function removeEntry(id) {
+  try {
+    await apiFetch(`http://localhost:8080/api/v1/entries/${id}`, {
+      method: "DELETE",
     });
+    console.log(`Removed entry with id: ${id}`);
+    return true;
+  } catch (error) {
+    console.error("Error removing entry:", error);
+    throw error;
+  }
 }
-
-export { getEntries, postEntry, updateEntry, removeEntry };
